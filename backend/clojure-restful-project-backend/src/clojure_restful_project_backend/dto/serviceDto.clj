@@ -1,6 +1,6 @@
 (ns clojure-restful-project-backend.dto.serviceDto
   (:require [schema.core :as s]
-            [clojure-restful-project-backend.models.service :refer [Service]]))
+            [clojure-restful-project-backend.models.service :refer [service]]))
 
 (s/defschema ServiceDTO
   {:name           s/Str

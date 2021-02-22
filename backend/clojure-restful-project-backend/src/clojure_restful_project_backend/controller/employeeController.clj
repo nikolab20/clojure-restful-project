@@ -10,23 +10,23 @@
 
 (def employee-routes
   [(POST "/employees" []
-     :tags ["employee"]
+     :tags ["Employee"]
      :body [create-employee-req EmployeeDTO]
      (create-employee create-employee-req))
    (GET "/employees" []
-     :tags ["employee"]
+     :tags ["Employee"]
      (get-employees))
    (GET "/employees/:id" []
      :path-params [id :- s/Int]
-     :tags ["employee"]
+     :tags ["Employee"]
      (get-employee id))
    (PUT "/employees/:id" []
-     :tags ["employee"]
+     :tags ["Employee"]
      :path-params [id :- s/Int]
      :body [updated-employee EmployeeDTO]
      (update-employee id updated-employee)
      )
    (DELETE "/employees/:id" []
-     :tags ["employee"]
+     :tags ["Employee"]
      :path-params [id :- s/Int]
      (delete-employee id))])

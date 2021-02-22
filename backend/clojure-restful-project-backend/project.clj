@@ -9,7 +9,8 @@
                  [ring/ring-jetty-adapter "1.8.2"]
                  [toucan "1.15.1"]
                  [mysql/mysql-connector-java "8.0.12"]
-                 [buddy/buddy-hashers "1.7.0"]]
+                 [buddy/buddy-hashers "1.7.0"]
+                 [clj-time "0.15.2"]]
   :main ^:skip-aot clojure-restful-project-backend.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

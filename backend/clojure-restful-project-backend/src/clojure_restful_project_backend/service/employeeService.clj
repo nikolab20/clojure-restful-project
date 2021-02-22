@@ -2,10 +2,7 @@
   (:require [clojure-restful-project-backend.models.employee :refer [Employee]]
             [toucan.db :as db]
             [ring.util.http-response :refer [ok not-found created]]
-            [buddy.hashers :as hashers]))
-
-(defn crypt-password [user-req]
-  (-> (update user-req :password hashers/derive)))
+            [clojure-restful-project-backend.service.commonService :refer [crypt-password]]))
 
 (defn id->created [id]
   (created (str "/employees/" id) {:id id}))
@@ -19,7 +16,7 @@
 (defn get-employees []
   (->> (db/select Employee)
        (map #(dissoc % :password))
-       ok))
+       (ok)))
 
 (defn employee->response [employee]
   (if employee
