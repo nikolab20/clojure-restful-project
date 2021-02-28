@@ -30,7 +30,7 @@
 
 (defn update-employee [id updated-employee]
   (db/update! Employee id (crypt-password updated-employee))
-  (ok))
+  (ok id))
 
 (defn delete-employee [id]
   (db/delete! Employee :id id)

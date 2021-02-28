@@ -4,5 +4,5 @@
 
 (s/defschema ServiceDTO
   {:name           s/Str
-   :description    s/Int
+   :description    s/Str
    :idObjectOfSale s/Int})

@@ -26,7 +26,7 @@
 
 (defn update-service [id updated-service]
   (db/update! service id updated-service)
-  (ok))
+  (ok id))
 
 (defn delete-service [id]
   (db/delete! service :id id)

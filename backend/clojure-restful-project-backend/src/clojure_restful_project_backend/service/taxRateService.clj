@@ -26,7 +26,7 @@
 
 (defn update-tax-rate [id updated-tax-rate]
   (db/update! TaxRate id updated-tax-rate)
-  (ok))
+  (ok id))
 
 (defn delete-tax-rate [id]
   (db/delete! TaxRate :id id)

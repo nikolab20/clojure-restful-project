@@ -26,7 +26,7 @@
 
 (defn update-car-part [id updated-car-part]
   (db/update! CarPart id updated-car-part)
-  (ok))
+  (ok id))
 
 (defn delete-car-part [id]
   (db/delete! CarPart :id id)

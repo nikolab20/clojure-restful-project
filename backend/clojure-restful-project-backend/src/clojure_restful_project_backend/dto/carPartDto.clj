@@ -5,6 +5,6 @@
 (s/defschema CarPartDTO
   {:name           s/Str
    :manufacturer   s/Str
-   :description    s/Int
+   :description    s/Str
    :idObjectOfSale s/Int
    :stock          s/Int})

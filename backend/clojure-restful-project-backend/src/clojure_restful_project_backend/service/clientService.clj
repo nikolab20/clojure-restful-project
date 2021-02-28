@@ -26,7 +26,7 @@
 
 (defn update-client [id updated-client]
   (db/update! client id updated-client)
-  (ok))
+  (ok id))
 
 (defn delete-client [id]
   (db/delete! client :id id)

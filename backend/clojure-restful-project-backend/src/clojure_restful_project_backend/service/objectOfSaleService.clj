@@ -26,7 +26,7 @@
 
 (defn update-object-of-sale [id updated-object-of-sale]
   (db/update! ObjectOfSale id updated-object-of-sale)
-  (ok))
+  (ok id))
 
 (defn delete-object-of-sale [id]
   (db/delete! ObjectOfSale :id id)

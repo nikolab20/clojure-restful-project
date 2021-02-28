@@ -14,11 +14,31 @@
     (db/insert! InvoiceItem (assoc value :IDinvoice id)))
   (id->created id))
 
+(defn update-invoice [id updated-invoice]
+  (db/update! Invoice id updated-invoice)
+  (ok id))
+
 (defn return-today []
   (f/unparse (f/formatter "yyyy-MM-dd") (l/local-now)))
 
+(defn calculateTotal [list-of-items]
+  (def totalPrice 0)
+  (doseq [value list-of-items]
+    (def totalPrice (+ totalPrice (:totalPrice value))))
+  :totalPrice
+  )
+
+(defn calculateTotalWithTax [list-of-items]
+  (def totalPriceWithTax 0)
+  (doseq [value list-of-items]
+    (def totalPriceWithTax (+ totalPriceWithTax (:totalPrice value))))
+  :totalPriceWithTax
+  )
+
 (defn create-invoice [create-invoice-req list-of-items]
-  (->> (db/insert! Invoice (assoc create-invoice-req :date (return-today)))
+  (->> (db/insert! Invoice (assoc create-invoice-req :date (return-today)
+                                                     :totalPrice ((calculateTotal list-of-items) :totalPrice)
+                                                     :totalPriceWithTax ((calculateTotalWithTax list-of-items) :totalPriceWithTax)))
        :id
        (add-invoice-items list-of-items)))
 
@@ -34,10 +54,6 @@
 (defn get-invoice [invoice-id]
   (-> (Invoice invoice-id)
       invoice->response))
-
-(defn update-invoice [id updated-invoice]
-  (db/update! Invoice id updated-invoice)
-  (ok))
 
 (defn delete-invoice [id]
   (db/delete! Invoice :id id)
