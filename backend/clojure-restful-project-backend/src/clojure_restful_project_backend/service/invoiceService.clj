@@ -16,14 +16,13 @@
 
 (defn update-invoice [id updated-invoice]
   (db/update! Invoice id updated-invoice)
-  (ok id)
+  (ok id))
 
-  defn calculateTotal [list-of-items]
+(defn calculateTotal [list-of-items]
   (def totalPrice 0)
   (doseq [item list-of-items]
     (def totalPrice (+ totalPrice (* (:totalPrice item) (:count item)))))
-  totalPrice
-  )
+  totalPrice)
 
 (defn calculateTotalWithTax [list-of-items]
   (def totalPriceWithTax 0)
