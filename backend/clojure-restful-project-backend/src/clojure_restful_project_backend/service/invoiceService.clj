@@ -16,29 +16,26 @@
 
 (defn update-invoice [id updated-invoice]
   (db/update! Invoice id updated-invoice)
-  (ok id))
+  (ok id)
 
-(defn return-today []
-  (f/unparse (f/formatter "yyyy-MM-dd") (l/local-now)))
-
-(defn calculateTotal [list-of-items]
+  defn calculateTotal [list-of-items]
   (def totalPrice 0)
-  (doseq [value list-of-items]
-    (def totalPrice (+ totalPrice (:totalPrice value))))
-  :totalPrice
+  (doseq [item list-of-items]
+    (def totalPrice (+ totalPrice (* (:totalPrice item) (:count item)))))
+  totalPrice
   )
 
 (defn calculateTotalWithTax [list-of-items]
   (def totalPriceWithTax 0)
-  (doseq [value list-of-items]
-    (def totalPriceWithTax (+ totalPriceWithTax (:totalPrice value))))
-  :totalPriceWithTax
+  (doseq [item list-of-items]
+    (def totalPriceWithTax (+ totalPriceWithTax (* (:totalPriceWithTax item) (:count item)))))
+  totalPriceWithTax
   )
 
 (defn create-invoice [create-invoice-req list-of-items]
-  (->> (db/insert! Invoice (assoc create-invoice-req :date (return-today)
-                                                     :totalPrice ((calculateTotal list-of-items) :totalPrice)
-                                                     :totalPriceWithTax ((calculateTotalWithTax list-of-items) :totalPriceWithTax)))
+  (->> (db/insert! Invoice (assoc create-invoice-req :date "2021-02-02"
+                                                     :totalPrice (calculateTotal list-of-items)
+                                                     :totalPriceWithTax (calculateTotalWithTax list-of-items)))
        :id
        (add-invoice-items list-of-items)))
 

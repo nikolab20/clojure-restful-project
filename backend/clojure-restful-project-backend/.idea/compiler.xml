@@ -14,5 +14,6 @@
       <entry name="!?*.clj" />
       <entry name="!?*.aj" />
     </wildcardResourcePatterns>
+    <bytecodeTargetLevel target="11" />
   </component>
 </project>

@@ -7,6 +7,7 @@
             [clojure-restful-project-backend.service.objectOfSaleService :as objectOfSaleService]
             [clojure-restful-project-backend.service.carPartService :as carPartService]
             [clojure-restful-project-backend.service.serviceService :as serviceService]
+            [clojure-restful-project-backend.service.invoiceService :as invoiceService]
             [toucan.db :as db]))
 
 (db/set-default-db-connection!
@@ -367,79 +368,8 @@
           update (objectOfSaleService/update-object-of-sale ((object-of-sale :body) :id) {:price        50
                                                                                           :priceWithTax (+ 50 (* 50 (/ ((found-tax-rate :body) :value) 100)))
                                                                                           :idTaxRate    ((found-tax-rate :body) :id)})
-          found-object-of=sale (objectOfSaleService/get-object-of-sale (update :body))]
-      (is (= 50M ((found-object-of=sale :body) :price)))
-      )
-    )
-  )
-
-(deftest find-all-objects-of-sale
-  (testing "Find all objects of sale"
-    (def objectsOfSaleCount (count ((objectOfSaleService/get-objects-of-sale) :body)))
-    (let [taxRate (taxRateService/create-tax-rate {:value 20
-                                                   :tag   "PDV"})
-          found-tax-rate (taxRateService/get-tax-rate ((taxRate :body) :id))]
-      (objectOfSaleService/create-object-of-sale {:price        50
-                                                  :priceWithTax (+ 50 (* 50 (/ ((found-tax-rate :body) :value) 100)))
-                                                  :idTaxRate    ((found-tax-rate :body) :id)}))
-      (is (= (inc objectsOfSaleCount) (count ((objectOfSaleService/get-objects-of-sale) :body))))
-      )
-    )
-
-;invoice
-
-(deftest create-invoice
-  (testing "Test create invoice"
-    ;(let [taxRate (taxRateService/create-tax-rate {:value 20
-    ;                                               :tag   "PDV"})
-    ;      found-tax-rate (taxRateService/get-tax-rate ((taxRate :body) :id))
-    ;      object-of-sale (objectOfSaleService/create-object-of-sale {:price        50
-    ;                                                                 :priceWithTax (+ 50 (* 50 (/ ((found-tax-rate :body) :value) 100)))
-    ;                                                                 :idTaxRate    ((found-tax-rate :body) :id)})
-    ;      found-object-of-sale (objectOfSaleService/get-object-of-sale ((object-of-sale :body) :id))]
-    ;  (is (= 50M ((found-object-of-sale :body) :price)))
-    ;  )
-    (let [client (clientService/create-client {:firstName      "Nikola"
-                                               :lastName       "Bakic"
-                                               :numberOfVisits 0
-                                               :debt           0.0})
-          found-client (clientService/get-client ((client :body) :id))
-          employee (employeeService/create-employee {:firstName   "Nikola"
-                                                     :lastName    "Bakic"
-                                                     :address     "Beograd BB"
-                                                     :phoneNumber "05643074327"
-                                                     :email       "nikola@test.com"
-                                                     :username    "nikolab"
-                                                     :password    "nikolab"})
-          found-employee (employeeService/get-employee ((employee :body) :id))])
-    )
-  )
-
-(deftest delete-object-of-sale
-  (testing "Test delete object of sale"
-    (let [taxRate (taxRateService/create-tax-rate {:value 20
-                                                   :tag   "PDV"})
-          found-tax-rate (taxRateService/get-tax-rate ((taxRate :body) :id))
-          object-of-sale (objectOfSaleService/create-object-of-sale {:price        50
-                                                                     :priceWithTax (+ 50 (* 50 (/ ((found-tax-rate :body) :value) 100)))
-                                                                     :idTaxRate    ((found-tax-rate :body) :id)})]
-      (objectOfSaleService/delete-object-of-sale ((object-of-sale :body) :id))
-      (is (= nil ((objectOfSaleService/get-object-of-sale ((object-of-sale :body) :id)) :body)))
-      )))
-
-(deftest update-object-of-sale
-  (testing "Test update object of sale"
-    (let [taxRate (taxRateService/create-tax-rate {:value 20
-                                                   :tag   "PDV"})
-          found-tax-rate (taxRateService/get-tax-rate ((taxRate :body) :id))
-          object-of-sale (objectOfSaleService/create-object-of-sale {:price        45
-                                                                     :priceWithTax (+ 45 (* 45 (/ ((found-tax-rate :body) :value) 100)))
-                                                                     :idTaxRate    ((found-tax-rate :body) :id)})
-          update (objectOfSaleService/update-object-of-sale ((object-of-sale :body) :id) {:price        50
-                                                                                          :priceWithTax (+ 50 (* 50 (/ ((found-tax-rate :body) :value) 100)))
-                                                                                          :idTaxRate    ((found-tax-rate :body) :id)})
-          found-object-of=sale (objectOfSaleService/get-object-of-sale (update :body))]
-      (is (= 50M ((found-object-of=sale :body) :price)))
+          found-object-of-sale (objectOfSaleService/get-object-of-sale (update :body))]
+      (is (= 50M ((found-object-of-sale :body) :price)))
       )
     )
   )
@@ -454,5 +384,152 @@
                                                   :priceWithTax (+ 50 (* 50 (/ ((found-tax-rate :body) :value) 100)))
                                                   :idTaxRate    ((found-tax-rate :body) :id)}))
     (is (= (inc objectsOfSaleCount) (count ((objectOfSaleService/get-objects-of-sale) :body))))
+    )
+  )
+
+;invoice
+
+(deftest create-invoice
+  (testing "Test create invoice"
+    (let [client (clientService/create-client {:firstName      "Nikola" :lastName "Bakic"
+                                               :numberOfVisits 0 :debt 0.0})
+          found-client (clientService/get-client ((client :body) :id))
+          employee (employeeService/create-employee {:firstName   "Nikola" :lastName "Bakic" :address "Beograd BB"
+                                                     :phoneNumber "05643074327" :email "nikola@test.com"
+                                                     :username    "nikolab" :password "nikolab"})
+          found-employee (employeeService/get-employee ((employee :body) :id))
+          taxRate (taxRateService/create-tax-rate {:value 20
+                                                   :tag   "PDV"})
+          found-tax-rate (taxRateService/get-tax-rate ((taxRate :body) :id))
+          object-of-sale (objectOfSaleService/create-object-of-sale {:price        50
+                                                                     :priceWithTax (+ 50 (* 50 (/ ((found-tax-rate :body) :value) 100)))
+                                                                     :idTaxRate    ((found-tax-rate :body) :id)})
+          found-object-of-sale (objectOfSaleService/get-object-of-sale ((object-of-sale :body) :id))
+          car-part (carPartService/create-car-part {:name        "Front light" :manufacturer "Valeo"
+                                                    :description "Test" :idObjectOfSale ((object-of-sale :body) :id)
+                                                    :stock       10})
+          invoice (invoiceService/create-invoice {:date              nil :totalPrice 0
+                                                  :totalPriceWithTax 0 :canceled 0
+                                                  :IDemployee        ((found-employee :body) :id) :IDclient ((found-client :body) :id)
+                                                  }
+                                                 [{:ordinal           1 :count 5
+                                                   :totalPrice        ((found-object-of-sale :body) :price)
+                                                   :totalPriceWithTax ((found-object-of-sale :body) :pricewithtax)
+                                                   :measurementUnit   "kg" :IDobjectOfSale ((object-of-sale :body) :id)
+                                                   :IDinvoice         0
+                                                   }]
+                                                 )
+          found-invoice (invoiceService/get-invoice ((invoice :body) :id))]
+      (is (= 300M ((found-invoice :body) :totalpricewithtax)))
+      )
+    )
+  )
+
+(deftest delete-invoice
+  (testing "Test delete invoice"
+    (let [client (clientService/create-client {:firstName      "Nikola" :lastName "Bakic"
+                                               :numberOfVisits 0 :debt 0.0})
+          found-client (clientService/get-client ((client :body) :id))
+          employee (employeeService/create-employee {:firstName   "Nikola" :lastName "Bakic" :address "Beograd BB"
+                                                     :phoneNumber "05643074327" :email "nikola@test.com"
+                                                     :username    "nikolab" :password "nikolab"})
+          found-employee (employeeService/get-employee ((employee :body) :id))
+          taxRate (taxRateService/create-tax-rate {:value 20
+                                                   :tag   "PDV"})
+          found-tax-rate (taxRateService/get-tax-rate ((taxRate :body) :id))
+          object-of-sale (objectOfSaleService/create-object-of-sale {:price        50
+                                                                     :priceWithTax (+ 50 (* 50 (/ ((found-tax-rate :body) :value) 100)))
+                                                                     :idTaxRate    ((found-tax-rate :body) :id)})
+          found-object-of-sale (objectOfSaleService/get-object-of-sale ((object-of-sale :body) :id))
+          car-part (carPartService/create-car-part {:name        "Front light" :manufacturer "Valeo"
+                                                    :description "Test" :idObjectOfSale ((object-of-sale :body) :id)
+                                                    :stock       10})
+          invoice (invoiceService/create-invoice {:date              nil :totalPrice 0
+                                                  :totalPriceWithTax 0 :canceled 0
+                                                  :IDemployee        ((found-employee :body) :id) :IDclient ((found-client :body) :id)
+                                                  }
+                                                 [{:ordinal           1 :count 5
+                                                   :totalPrice        ((found-object-of-sale :body) :price)
+                                                   :totalPriceWithTax ((found-object-of-sale :body) :pricewithtax)
+                                                   :measurementUnit   "kg" :IDobjectOfSale ((object-of-sale :body) :id)
+                                                   :IDinvoice         0
+                                                   }]
+                                                 )]
+      (invoiceService/delete-invoice ((invoice :body) :id))
+      (is (= nil ((invoiceService/get-invoice ((invoice :body) :id)) :body)))
+      )))
+
+(deftest update-invoice
+  (testing "Test update invoice"
+    (let [client (clientService/create-client {:firstName      "Nikola" :lastName "Bakic"
+                                               :numberOfVisits 0 :debt 0.0})
+          found-client (clientService/get-client ((client :body) :id))
+          employee (employeeService/create-employee {:firstName   "Nikola" :lastName "Bakic" :address "Beograd BB"
+                                                     :phoneNumber "05643074327" :email "nikola@test.com"
+                                                     :username    "nikolab" :password "nikolab"})
+          found-employee (employeeService/get-employee ((employee :body) :id))
+          taxRate (taxRateService/create-tax-rate {:value 20
+                                                   :tag   "PDV"})
+          found-tax-rate (taxRateService/get-tax-rate ((taxRate :body) :id))
+          object-of-sale (objectOfSaleService/create-object-of-sale {:price        50
+                                                                     :priceWithTax (+ 50 (* 50 (/ ((found-tax-rate :body) :value) 100)))
+                                                                     :idTaxRate    ((found-tax-rate :body) :id)})
+          found-object-of-sale (objectOfSaleService/get-object-of-sale ((object-of-sale :body) :id))
+          car-part (carPartService/create-car-part {:name        "Front light" :manufacturer "Valeo"
+                                                    :description "Test" :idObjectOfSale ((object-of-sale :body) :id)
+                                                    :stock       10})
+          invoice (invoiceService/create-invoice {:date              nil :totalPrice 0
+                                                  :totalPriceWithTax 0 :canceled 0
+                                                  :IDemployee        ((found-employee :body) :id) :IDclient ((found-client :body) :id)
+                                                  }
+                                                 [{:ordinal           1 :count 5
+                                                   :totalPrice        ((found-object-of-sale :body) :price)
+                                                   :totalPriceWithTax ((found-object-of-sale :body) :pricewithtax)
+                                                   :measurementUnit   "kg" :IDobjectOfSale ((object-of-sale :body) :id)
+                                                   :IDinvoice         0
+                                                   }]
+                                                 )
+          update (invoiceService/update-invoice ((invoice :body) :id) {:date              nil :totalPrice 0
+                                                                       :totalPriceWithTax 0 :canceled 1
+                                                                       :IDemployee        ((found-employee :body) :id) :IDclient ((found-client :body) :id)
+                                                                       })
+          found-invoice (invoiceService/get-invoice (update :body))]
+      (is (= 1 ((found-invoice :body) :canceled)))
+      )
+    )
+  )
+
+(deftest find-all-invoices
+  (testing "Find all invoices"
+    (def invoicesCount (count ((invoiceService/get-invoices) :body)))
+    (let [client (clientService/create-client {:firstName      "Nikola" :lastName "Bakic"
+                                               :numberOfVisits 0 :debt 0.0})
+          found-client (clientService/get-client ((client :body) :id))
+          employee (employeeService/create-employee {:firstName   "Nikola" :lastName "Bakic" :address "Beograd BB"
+                                                     :phoneNumber "05643074327" :email "nikola@test.com"
+                                                     :username    "nikolab" :password "nikolab"})
+          found-employee (employeeService/get-employee ((employee :body) :id))
+          taxRate (taxRateService/create-tax-rate {:value 20
+                                                   :tag   "PDV"})
+          found-tax-rate (taxRateService/get-tax-rate ((taxRate :body) :id))
+          object-of-sale (objectOfSaleService/create-object-of-sale {:price        50
+                                                                     :priceWithTax (+ 50 (* 50 (/ ((found-tax-rate :body) :value) 100)))
+                                                                     :idTaxRate    ((found-tax-rate :body) :id)})
+          found-object-of-sale (objectOfSaleService/get-object-of-sale ((object-of-sale :body) :id))
+          car-part (carPartService/create-car-part {:name        "Front light" :manufacturer "Valeo"
+                                                    :description "Test" :idObjectOfSale ((object-of-sale :body) :id)
+                                                    :stock       10})]
+      (invoiceService/create-invoice {:date              nil :totalPrice 0
+                                      :totalPriceWithTax 0 :canceled 0
+                                      :IDemployee        ((found-employee :body) :id) :IDclient ((found-client :body) :id)
+                                      }
+                                     [{:ordinal           1 :count 5
+                                       :totalPrice        ((found-object-of-sale :body) :price)
+                                       :totalPriceWithTax ((found-object-of-sale :body) :pricewithtax)
+                                       :measurementUnit   "kg" :IDobjectOfSale ((object-of-sale :body) :id)
+                                       :IDinvoice         0
+                                       }]
+                                     ))
+    (is (= (inc invoicesCount) (count ((invoiceService/get-invoices) :body))))
     )
   )

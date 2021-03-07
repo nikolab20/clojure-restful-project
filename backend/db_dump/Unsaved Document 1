@@ -1,0 +1,100 @@
+CREATE DATABASE `clj_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+CREATE TABLE `carPart` (
+  `ID` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `manufacturer` varchar(100) DEFAULT NULL,
+  `description` varchar(100) DEFAULT NULL,
+  `IDobjectOfSale` bigint NOT NULL,
+  `stock` bigint DEFAULT NULL,
+  PRIMARY KEY (`ID`,`IDobjectOfSale`),
+  KEY `carPart_FK` (`IDobjectOfSale`),
+  CONSTRAINT `carPart_FK` FOREIGN KEY (`IDobjectOfSale`) REFERENCES `objectOfSale` (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `client` (
+  `ID` bigint NOT NULL AUTO_INCREMENT,
+  `firstName` varchar(100) NOT NULL,
+  `lastName` varchar(100) NOT NULL,
+  `numberOfVIsits` int DEFAULT '0',
+  `debt` decimal(10,0) DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  CONSTRAINT `debt_CHECK` CHECK ((`debt` >= 0))
+) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `employee` (
+  `ID` bigint NOT NULL AUTO_INCREMENT,
+  `firstName` varchar(100) DEFAULT NULL,
+  `lastName` varchar(100) DEFAULT NULL,
+  `address` varchar(100) DEFAULT NULL,
+  `phoneNumber` varchar(100) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `username` varchar(100) DEFAULT NULL,
+  `password` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `invoice` (
+  `ID` bigint NOT NULL AUTO_INCREMENT,
+  `date` date DEFAULT NULL,
+  `totalPrice` decimal(10,0) DEFAULT NULL,
+  `totalPriceWithTax` decimal(10,0) DEFAULT NULL,
+  `canceled` tinyint DEFAULT NULL,
+  `IDemployee` bigint NOT NULL,
+  `IDclient` bigint NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `racun_FK` (`IDclient`),
+  KEY `racun_FK_1` (`IDemployee`),
+  CONSTRAINT `racun_FK` FOREIGN KEY (`IDclient`) REFERENCES `client` (`ID`),
+  CONSTRAINT `racun_FK_1` FOREIGN KEY (`IDemployee`) REFERENCES `employee` (`ID`),
+  CONSTRAINT `totalPrice_CHECK` CHECK ((`totalPrice` >= 0)),
+  CONSTRAINT `totalPriceT_CHECK` CHECK ((`totalPriceWithTax` >= 0))
+) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `invoiceItem` (
+  `IDinvoice` bigint NOT NULL,
+  `ordinal` bigint NOT NULL,
+  `count` double DEFAULT NULL,
+  `totalPrice` decimal(10,0) DEFAULT NULL,
+  `totalPriceWithTax` decimal(10,0) DEFAULT NULL,
+  `measurementUnit` varchar(100) DEFAULT NULL,
+  `IDobjectOfSale` bigint DEFAULT NULL,
+  PRIMARY KEY (`IDinvoice`,`ordinal`),
+  KEY `invoiceItem_FK` (`IDobjectOfSale`),
+  CONSTRAINT `invoiceItem_FK` FOREIGN KEY (`IDobjectOfSale`) REFERENCES `objectOfSale` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `invoiceItem_FK_1` FOREIGN KEY (`IDinvoice`) REFERENCES `invoice` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `count_CHECK` CHECK ((`count` >= 0)),
+  CONSTRAINT `totalPriceItem_CHECK` CHECK ((`totalPrice` >= 0)),
+  CONSTRAINT `totalPriceTItem_CHECK` CHECK ((`totalPriceWithTax` >= 0))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `objectOfSale` (
+  `ID` bigint NOT NULL AUTO_INCREMENT,
+  `price` decimal(10,0) NOT NULL,
+  `priceWithTax` decimal(10,0) NOT NULL,
+  `IDtaxRate` bigint DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `objectOfSale_FK` (`IDtaxRate`),
+  CONSTRAINT `objectOfSale_FK` FOREIGN KEY (`IDtaxRate`) REFERENCES `taxRate` (`ID`),
+  CONSTRAINT `price_CHECK` CHECK ((`price` >= 0)),
+  CONSTRAINT `pricet_CHECK` CHECK ((`priceWithTax` >= 0))
+) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `service` (
+  `ID` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `description` varchar(100) DEFAULT NULL,
+  `IDobjectOfSale` bigint NOT NULL,
+  PRIMARY KEY (`ID`,`IDobjectOfSale`),
+  KEY `service_FK` (`IDobjectOfSale`),
+  CONSTRAINT `service_FK` FOREIGN KEY (`IDobjectOfSale`) REFERENCES `objectOfSale` (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `taxRate` (
+  `ID` bigint NOT NULL AUTO_INCREMENT,
+  `tag` varchar(100) NOT NULL,
+  `value` decimal(10,0) NOT NULL,
+  PRIMARY KEY (`ID`),
+  CONSTRAINT `value_CHECK` CHECK ((`value` >= 0))
+) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
