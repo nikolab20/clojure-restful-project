@@ -16,3 +16,44 @@ The project was developed as part of the assignment for the course Software Engi
 The Clojure Car Service App represent the application for keeping records of invoices, invoice items and sold car parts or provided services to clients. Every employee can create new invoice for client and add item to that invoice. Each invoice item refers to a specific one object of sale that relates to an car part or service. Each invoice item has price and price with tax that relates to specific one tax rate which employee selects when entering a new invoice item.ž
 
 # Launch the application
+
+Navigate to root folder of project and then install dependecies.
+
+```sh
+lein deps
+``` 
+
+After that, start application with the following command.
+
+```sh
+lein run
+``` 
+
+To test functionality of the application, enter the following link in your web browser.
+
+```sh
+http://localhost:3000/swagger
+```
+
+This will open the browser window.
+
+![alt text](https://github.com/nikolab20/Clojure-Car-Service-App/blob/main/backend/images/Swagger.png)
+
+# Application testing
+
+In Clojure application a unit-testing framework included in its clojure.test namespace. To run tests, enter the following command.
+
+```sh
+lein test
+``` 
+
+As a result of testing, the following was obtained
+
+![alt text](https://github.com/nikolab20/Clojure-Car-Service-App/blob/main/backend/images/Testing.png)
+
+# References
+
+1. https://github.com/clojure-cookbook/clojure-cookbook
+2. https://oli.me.uk/clojure-projects-from-scratch/
+3. https://gist.github.com/daveray/1441520#file-seesaw-repl-tutorial-clj-L33
+4. https://github.com/demystifyfp/BlogSamples/tree/master/clojure/restful-crud
